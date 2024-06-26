@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ireland-employments-permit-deployment
+  labels:
+    app: ireland-employments-permit
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ireland-employments-permit
+  template:
+    metadata:
+      labels:
+        app: ireland-employments-permit
+    spec:
+      containers:
+      - name: ireland-employments-permit
+        image: your-docker-repo/ireland-employments-permit:latest
+        ports:
+        - containerPort: 8080
+        - containerPort: 4000
+        env:
+        - name: FLASK_RUN_PORT
+          value: "4000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ireland-employments-permit-service
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 4000
+  selector:
+    app: ireland-employments-permit
