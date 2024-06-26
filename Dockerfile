@@ -12,13 +12,12 @@ RUN git clone https://github.com/siqueiraa/ireland-employments-permit.git .
 
 # Create and activate virtual environment
 RUN python -m venv .venv
-RUN . .venv/bin/activate
 
 # Install Python dependencies within the virtual environment
 RUN . .venv/bin/activate && pip install --no-cache-dir -r requirements.txt
 
-# Install Airflow and Kubernetes provider within the virtual environment
-RUN . .venv/bin/activate && pip install apache-airflow[cncf.kubernetes]
+# Set Airflow environment variables to not load examples
+ENV AIRFLOW__CORE__LOAD_EXAMPLES=False
 
 # Set up Airflow
 RUN . .venv/bin/activate && airflow db init
@@ -33,8 +32,8 @@ ENV AIRFLOW_PASSWORD=admin
 
 RUN . .venv/bin/activate && airflow users create --username $AIRFLOW_USER --firstname $AIRFLOW_FIRSTNAME --lastname $AIRFLOW_LASTNAME --role $AIRFLOW_ROLE --email $AIRFLOW_EMAIL --password $AIRFLOW_PASSWORD
 
-# Expose the ports for Airflow webserver
+# Expose the ports for Airflow webserver and Flask app
 EXPOSE 8080 4000
 
-# Start Airflow scheduler and webserver
-CMD . .venv/bin/activate && airflow scheduler & airflow webserver --port 8080
+# Start Airflow scheduler, webserver, and the Flask app
+CMD . .venv/bin/activate && airflow scheduler & airflow webserver --port 8080 & python app.py
