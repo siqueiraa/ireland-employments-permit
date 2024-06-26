@@ -5,7 +5,7 @@ metadata:
   labels:
     app: ireland-employments-permit
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ireland-employments-permit
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: ireland-employments-permit
-        image: your-docker-repo/ireland-employments-permit:latest
+        image: siqueiraa/ireland-employments-permit:latest
         ports:
         - containerPort: 8080
         - containerPort: 4000
