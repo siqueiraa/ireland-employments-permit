@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 # Set the working directory in the container
 WORKDIR /app
@@ -16,21 +16,28 @@ RUN python -m venv .venv
 # Install Python dependencies within the virtual environment
 RUN /bin/bash -c "source .venv/bin/activate && pip install --no-cache-dir -r requirements.txt"
 
+# Install pendulum before airflow to avoid conflicts
+RUN /bin/bash -c "source .venv/bin/activate && pip install pendulum==2.1.2"
+
 # Install Airflow and Kubernetes provider within the virtual environment
 RUN /bin/bash -c "source .venv/bin/activate && pip install apache-airflow[cncf.kubernetes]"
 
 # Copy DAGs to the Airflow DAGs directory
 COPY dags/ /app/dags/
 
-# Set the Airflow home directory and create the configuration file
+# Set the Airflow home directory
 ENV AIRFLOW_HOME=/app/airflow
-RUN mkdir -p ${AIRFLOW_HOME}
+
+# Copy a template airflow.cfg file and modify it
+COPY airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
+RUN sed -i 's|dags_folder = /path/to/dags|dags_folder = /app/dags|' ${AIRFLOW_HOME}/airflow.cfg
+RUN sed -i 's|load_examples = True|load_examples = False|' ${AIRFLOW_HOME}/airflow.cfg
 
 # Initialize Airflow default configuration
-RUN /bin/bash -c "source .venv/bin/activate && airflow db init && airflow config save ${AIRFLOW_HOME}/airflow.cfg"
+RUN mkdir -p ${AIRFLOW_HOME}
 
-# Append DAGs folder configuration to airflow.cfg
-RUN echo -e "\n[core]\ndags_folder = /app/dags" >> ${AIRFLOW_HOME}/airflow.cfg
+# Set up Airflow database
+RUN /bin/bash -c "source .venv/bin/activate && airflow db init"
 
 # Create Airflow user
 ENV AIRFLOW_USER=admin
