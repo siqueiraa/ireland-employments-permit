@@ -68,6 +68,10 @@ This project automates the process of downloading, processing, and providing emp
 
 The DAGs are defined in the `dags/` folder. The primary DAG is `check_and_run_processor_dag.py`, which checks for content changes on the specified URL and triggers the data processing if changes are detected.
 
+### Dashboard
+
+You can view the data on the [Google Looker Studio Dashboard](https://lookerstudio.google.com/reporting/a341875a-d2ed-4e36-b8f7-08edd883e4d4/page/htLqD).
+
 ### Contact
 
 For any inquiries or support, please reach out via [LinkedIn](https://www.linkedin.com/in/rafael-siqueiraa/).
