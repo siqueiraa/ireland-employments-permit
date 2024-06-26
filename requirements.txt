@@ -1,7 +1,7 @@
-pandas
-beautifulsoup4
-requests
-flask
-apache-airflow[cncf.kubernetes]
+pandas==2.2.2
+beautifulsoup4==4.12.3
+requests==2.32.3
+flask==2.2.5
+apache-airflow[cncf.kubernetes]==2.9.2
 pendulum==2.0.0
 

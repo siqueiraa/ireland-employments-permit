@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.10
+FROM python:3.10-slim
 
 # Set the working directory in the container
 WORKDIR /app
@@ -12,6 +12,7 @@ RUN git clone https://github.com/siqueiraa/ireland-employments-permit.git .
 
 # Create and activate virtual environment
 RUN python -m venv .venv
+
 
 # Install Python dependencies within the virtual environment
 RUN /bin/bash -c "source .venv/bin/activate && pip install --no-cache-dir -r requirements.txt"
@@ -31,7 +32,7 @@ RUN sed -i 's|load_examples = True|load_examples = False|' ${AIRFLOW_HOME}/airfl
 RUN mkdir -p ${AIRFLOW_HOME}
 
 # Set up Airflow database
-RUN /bin/bash -c "source .venv/bin/activate && airflow db migrate"
+RUN /bin/bash -c "source .venv/bin/activate && pip install flask_session && airflow db init"
 
 # Create Airflow user
 ENV AIRFLOW_USER=admin
