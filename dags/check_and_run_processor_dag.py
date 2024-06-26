@@ -23,7 +23,7 @@ dag = DAG(
     'check_and_run_processor',
     default_args=default_args,
     description='Check if content has changed and run processor.py',
-    schedule_interval=timedelta(days=1),
+    schedule_interval=timedelta(minutes=5),
     start_date=datetime(2024, 1, 1),
     catchup=False,
 )
