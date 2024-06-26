@@ -3,5 +3,5 @@ beautifulsoup4==4.12.3
 requests==2.32.3
 flask==2.2.5
 apache-airflow[cncf.kubernetes]==2.9.2
-pendulum==2.0.0
+pendulum==2.1.2
 
