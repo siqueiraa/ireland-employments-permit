@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.10-slim
+FROM python:3.10
 
 # Set the working directory in the container
 WORKDIR /app
@@ -16,14 +16,8 @@ RUN python -m venv .venv
 # Install Python dependencies within the virtual environment
 RUN /bin/bash -c "source .venv/bin/activate && pip install --no-cache-dir -r requirements.txt"
 
-# Install pendulum before airflow to avoid conflicts
-RUN /bin/bash -c "source .venv/bin/activate && pip install pendulum==2.1.2"
-
-# Install Airflow and Kubernetes provider within the virtual environment
-RUN /bin/bash -c "source .venv/bin/activate && pip install apache-airflow[cncf.kubernetes]"
-
 # Copy DAGs to the Airflow DAGs directory
-COPY dags/ /app/dags/
+#COPY dags/ /app/dags/
 
 # Set the Airflow home directory
 ENV AIRFLOW_HOME=/app/airflow

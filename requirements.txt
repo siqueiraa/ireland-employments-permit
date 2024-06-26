@@ -3,5 +3,5 @@ beautifulsoup4
 requests
 flask
 apache-airflow[cncf.kubernetes]
-pendulum
+pendulum==2.0.0
 
