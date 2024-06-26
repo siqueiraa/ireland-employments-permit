@@ -6,7 +6,7 @@ from custom_sensors import ContentChangeSensor
 
 # Define the URL and previous date for comparison
 URL = "https://enterprise.gov.ie/en/publications/employment-permit-statistics-{}.html".format(datetime.now().year)
-PREVIOUS_DATE = "4th June 2023"  # Replace with the actual previous date
+PREVIOUS_DATE = "4th June 2024"  # Replace with the actual previous date
 
 # Default arguments for the DAG
 default_args = {

@@ -2,13 +2,24 @@ import requests
 from bs4 import BeautifulSoup
 from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
+import os
 
 class ContentChangeSensor(BaseSensorOperator):
     @apply_defaults
-    def __init__(self, url, previous_date, *args, **kwargs):
+    def __init__(self, url, date_file_path, *args, **kwargs):
         super(ContentChangeSensor, self).__init__(*args, **kwargs)
         self.url = url
-        self.previous_date = previous_date
+        self.date_file_path = date_file_path
+
+    def read_previous_date(self):
+        if os.path.exists(self.date_file_path):
+            with open(self.date_file_path, 'r') as file:
+                return file.read().strip()
+        return None
+
+    def write_current_date(self, date):
+        with open(self.date_file_path, 'w') as file:
+            file.write(date)
 
     def poke(self, context):
         response = requests.get(self.url)
@@ -19,11 +30,14 @@ class ContentChangeSensor(BaseSensorOperator):
             return False
 
         current_date = date_tag.get_text(strip=True)
-        self.log.info(f"Current date: {current_date}")
-        self.log.info(f"Previous date: {self.previous_date}")
+        previous_date = self.read_previous_date()
 
-        if current_date != self.previous_date:
+        self.log.info(f"Current date: {current_date}")
+        self.log.info(f"Previous date: {previous_date}")
+
+        if current_date != previous_date:
             self.log.info("Content has changed.")
+            self.write_current_date(current_date)
             return True
         else:
             self.log.info("Content has not changed.")

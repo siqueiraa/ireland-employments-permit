@@ -48,4 +48,5 @@ RUN /bin/bash -c "source .venv/bin/activate && airflow users create --username $
 EXPOSE 8080 4000
 
 # Start Airflow scheduler, webserver, and the Flask app
-CMD /bin/bash -c "source .venv/bin/activate && airflow scheduler & airflow webserver --port 8080 & python app.py"
+CMD ["/bin/bash", "-c", "source .venv/bin/activate && airflow scheduler & airflow webserver --port 8080 & python app.py"]
+
