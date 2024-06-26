@@ -4,9 +4,12 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from custom_sensors import ContentChangeSensor
 
-# Define the URL and previous date for comparison
-URL = "https://enterprise.gov.ie/en/publications/employment-permit-statistics-{}.html".format(datetime.now().year)
-PREVIOUS_DATE = "4th June 2024"  # Replace with the actual previous date
+# Define the URL with the current year dynamically
+current_year = datetime.now().year
+URL = f"https://enterprise.gov.ie/en/publications/employment-permit-statistics-{current_year}.html"
+
+# Define the path to the date file
+DATE_FILE_PATH = f"date_file.txt"  # Ensure this path is correct and writable
 
 # Default arguments for the DAG
 default_args = {
@@ -32,7 +35,7 @@ dag = DAG(
 check_content_change = ContentChangeSensor(
     task_id='check_content_change',
     url=URL,
-    previous_date=PREVIOUS_DATE,
+    date_file_path=DATE_FILE_PATH,  # Path to the file storing the last known date
     poke_interval=600,  # Check every 10 minutes
     timeout=3600,  # Timeout after 1 hour
     dag=dag,
