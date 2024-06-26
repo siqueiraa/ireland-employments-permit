@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timedelta
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 from custom_sensors import ContentChangeSensor
 
 # Define the URL and previous date for comparison
@@ -23,7 +23,7 @@ dag = DAG(
     'check_and_run_processor',
     default_args=default_args,
     description='Check if content has changed and run processor.py',
-    schedule_interval=timedelta(minutes=5),
+    schedule=timedelta(minutes=5),
     start_date=datetime(2024, 1, 1),
     catchup=False,
 )

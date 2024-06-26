@@ -31,7 +31,7 @@ RUN sed -i 's|load_examples = True|load_examples = False|' ${AIRFLOW_HOME}/airfl
 RUN mkdir -p ${AIRFLOW_HOME}
 
 # Set up Airflow database
-RUN /bin/bash -c "source .venv/bin/activate && airflow db init"
+RUN /bin/bash -c "source .venv/bin/activate && airflow db migrate"
 
 # Create Airflow user
 ENV AIRFLOW_USER=admin
