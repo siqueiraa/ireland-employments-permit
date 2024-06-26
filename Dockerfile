@@ -19,20 +19,18 @@ RUN /bin/bash -c "source .venv/bin/activate && pip install --no-cache-dir -r req
 # Install Airflow and Kubernetes provider within the virtual environment
 RUN /bin/bash -c "source .venv/bin/activate && pip install apache-airflow[cncf.kubernetes]"
 
-# Set Airflow environment variables to not load examples
-ENV AIRFLOW__CORE__LOAD_EXAMPLES=False
-
 # Copy DAGs to the Airflow DAGs directory
-RUN mkdir -p /app/dags
 COPY dags/ /app/dags/
 
-# Set the Airflow home directory and configure the DAGs folder
+# Set the Airflow home directory and create the configuration file
 ENV AIRFLOW_HOME=/app/airflow
 RUN mkdir -p ${AIRFLOW_HOME}
-RUN echo -e "\n[core]\ndags_folder = /app/dags" >> ${AIRFLOW_HOME}/airflow.cfg
 
-# Set up Airflow
-RUN /bin/bash -c "source .venv/bin/activate && airflow db init"
+# Initialize Airflow default configuration
+RUN /bin/bash -c "source .venv/bin/activate && airflow db init && airflow config save ${AIRFLOW_HOME}/airflow.cfg"
+
+# Append DAGs folder configuration to airflow.cfg
+RUN echo -e "\n[core]\ndags_folder = /app/dags" >> ${AIRFLOW_HOME}/airflow.cfg
 
 # Create Airflow user
 ENV AIRFLOW_USER=admin
