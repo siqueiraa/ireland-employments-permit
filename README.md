@@ -1,28 +1,74 @@
-# Ireland Employment Permit Data Processor
+# Ireland Employments Permit
 
-This project consists of two main components: data processing and a web API. The data processor downloads and processes employment permit statistics from an oficial source, while the web API serves the processed data.
+This project automates the process of downloading, processing, and providing employment permit data for Ireland.
 
-## Table of Contents
-- [Project Structure](#project-structure)
-- [Requirements](#requirements)
-- [Setup](#setup)
-- [Usage](#usage)
-- [Endpoints](#endpoints)
+## Setup Instructions
 
-## Project Structure
-- **extract/**: Folder where raw data files will be downloaded.
-- **transform/**: Folder where the processed data file `normalized.xlsx` will be saved.
-- **processor.py**: Script to download and process the data.
-- **app.py**: Flask application to serve the processed data.
-- **requirements.txt**: File listing the Python dependencies.
+### Prerequisites
 
-## Requirements
-The project requires the following Python packages:
-- `pandas`
-- `beautifulsoup4`
-- `requests`
-- `flask`
+- Docker
+- Docker Compose (for local setup)
+- Kubernetes (for deployment on a cluster)
+- Airflow
 
-You can install these dependencies using the following command:
-```sh
-pip install -r requirements.txt
+### Local Setup with Docker Compose
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/siqueiraa/ireland-employments-permit.git
+    cd ireland-employments-permit
+    ```
+
+2. Build the Docker image:
+    ```bash
+    docker build -t siqueiraa/ireland-employments-permit:latest .
+    ```
+
+3. Run the services:
+    ```bash
+    docker-compose up -d
+    ```
+
+4. Access the application:
+    - The REST API will be available at `http://localhost:4000/data`
+    - Airflow UI will be available at `http://localhost:8080`
+
+### Kubernetes Setup
+
+1. Apply the Kubernetes manifests:
+    ```bash
+    kubectl apply -f k8s-deployment.yaml
+    ```
+
+2. Ensure the services are running:
+    ```bash
+    kubectl get pods
+    kubectl get services
+    ```
+
+3. Access the application:
+    - The REST API will be available at `http://<node-ip>:<node-port>/data`
+    - Airflow UI will be available at `http://<node-ip>:<node-port>`
+
+### Airflow Setup
+
+#### Initializing Airflow
+
+1. Initialize the Airflow database:
+    ```bash
+    airflow db init
+    ```
+
+2. Create an Airflow user:
+    ```bash
+    airflow users create --username admin --firstname FIRST_NAME --lastname LAST_NAME --role Admin --email admin@example.com
+    ```
+
+#### DAGs
+
+The DAGs are defined in the `dags/` folder. The primary DAG is `check_and_run_processor_dag.py`, which checks for content changes on the specified URL and triggers the data processing if changes are detected.
+
+### Contact
+
+For any inquiries or support, please reach out via [LinkedIn](https://www.linkedin.com/in/rafael-siqueiraa/).
+
