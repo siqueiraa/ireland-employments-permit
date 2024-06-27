@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ireland-employments-permit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ireland-employments-permit
+  template:
+    metadata:
+      labels:
+        app: ireland-employments-permit
+    spec:
+      containers:
+        - name: ireland-employments-permit
+          image: siqueiraa/ireland-employments-permit:latest
+          ports:
+            - containerPort: 4000
+            - containerPort: 8080
+          env:
+            - name: AIRFLOW__CORE__DAGS_FOLDER
+              value: /app/dags
+            - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+              value: sqlite:////app/airflow/airflow.db
+            - name: AIRFLOW__CORE__LOAD_EXAMPLES
+              value: "False"
+            - name: AIRFLOW__WEBSERVER__RBAC
+              value: "True"
+          command: ["/bin/sh", "-c", "airflow db init && airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin && airflow scheduler & airflow webserver & python app.py"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ireland-employments-permit
+spec:
+  selector:
+    app: ireland-employments-permit
+  type: NodePort
+  ports:
+    - name: web
+      protocol: TCP
+      port: 4000
+    - name: airflow
+      protocol: TCP
+      port: 8080

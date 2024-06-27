@@ -11,11 +11,12 @@ RUN apt-get update && apt-get install -y git
 RUN git clone https://github.com/siqueiraa/ireland-employments-permit.git .
 
 # Create and activate virtual environment
-RUN python -m venv .venv
+#RUN python -m venv .venv
 
 
 # Install Python dependencies within the virtual environment
-RUN /bin/bash -c "source .venv/bin/activate && pip install --no-cache-dir -r requirements.txt"
+#RUN /bin/bash -c "source .venv/bin/activate && pip install --no-cache-dir -r requirements.txt"
+RUN /bin/bash -c "pip install --no-cache-dir -r requirements.txt"
 
 # Copy DAGs to the Airflow DAGs directory
 #COPY dags/ /app/dags/
@@ -32,7 +33,7 @@ RUN sed -i 's|load_examples = True|load_examples = False|' ${AIRFLOW_HOME}/airfl
 RUN mkdir -p ${AIRFLOW_HOME}
 
 # Set up Airflow database
-RUN /bin/bash -c "source .venv/bin/activate && pip install flask_session && airflow db init"
+RUN /bin/bash -c "pip install flask_session && airflow db init"
 
 # Create Airflow user
 ENV AIRFLOW_USER=admin
@@ -42,11 +43,11 @@ ENV AIRFLOW_ROLE=Admin
 ENV AIRFLOW_EMAIL=admin@example.com
 ENV AIRFLOW_PASSWORD=admin
 
-RUN /bin/bash -c "source .venv/bin/activate && airflow users create --username $AIRFLOW_USER --firstname $AIRFLOW_FIRSTNAME --lastname $AIRFLOW_LASTNAME --role $AIRFLOW_ROLE --email $AIRFLOW_EMAIL --password $AIRFLOW_PASSWORD"
+RUN /bin/bash -c "airflow users create --username $AIRFLOW_USER --firstname $AIRFLOW_FIRSTNAME --lastname $AIRFLOW_LASTNAME --role $AIRFLOW_ROLE --email $AIRFLOW_EMAIL --password $AIRFLOW_PASSWORD"
 
 # Expose the ports for Airflow webserver and Flask app
 EXPOSE 8080 4000
 
 # Start Airflow scheduler, webserver, and the Flask app
-CMD ["/bin/bash", "-c", "source .venv/bin/activate && airflow scheduler & airflow webserver --port 8080 & python app.py"]
+CMD ["/bin/bash", "-c", "airflow scheduler & airflow webserver --port 8080 & python app.py"]
 

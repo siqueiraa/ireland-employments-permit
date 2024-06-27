@@ -29,6 +29,7 @@ dag = DAG(
     schedule=timedelta(minutes=5),
     start_date=datetime(2024, 1, 1),
     catchup=False,
+    is_paused_upon_creation=False,
 )
 
 # Define the sensor task
