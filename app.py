@@ -18,8 +18,8 @@ def get_data():
 
     try:
         df = pd.read_excel(file_path)
+        df['Month'] = df['Month'].fillna('')
         data = df.to_dict(orient='records')
-        data['Month'] = data['Month'].fillna('')
 
         logging.info(f"Data read successfully from {file_path}")
         return jsonify(data)
