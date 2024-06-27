@@ -29,7 +29,8 @@ ENV AIRFLOW_HOME=/app/airflow
 COPY airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
 RUN sed -i 's|dags_folder = /path/to/dags|dags_folder = /app/dags|' ${AIRFLOW_HOME}/airflow.cfg
 RUN sed -i 's|load_examples = True|load_examples = False|' ${AIRFLOW_HOME}/airflow.cfg
-RUN echo -e "\n[webserver]\nweb_server_host = 0.0.0.0" >> ${AIRFLOW_HOME}/airflow.cfg
+RUN sed -i 's|web_server_host = .*|web_server_host = 0.0.0.0|' ${AIRFLOW_HOME}/airflow.cfg
+
 
 
 
@@ -53,5 +54,5 @@ RUN /bin/bash -c "airflow users create --username $AIRFLOW_USER --firstname $AIR
 EXPOSE 8080 4000
 
 # Start Airflow scheduler, webserver, and the Flask app
-CMD ["/bin/bash", "-c", "airflow scheduler & airflow webserver --port 8080 & python app.py"]
+CMD ["/bin/bash", "-c", "airflow scheduler & && airflow webserver --port 8080 & && python app.py &"]
 

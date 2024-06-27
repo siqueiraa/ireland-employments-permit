@@ -27,7 +27,7 @@ spec:
               value: "False"
             - name: AIRFLOW__WEBSERVER__RBAC
               value: "True"
-          command: ["/bin/sh", "-c", "airflow db init && airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin && airflow scheduler & airflow webserver & python app.py"]
+          #command: ["/bin/sh", "-c", "airflow db init && airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin && airflow scheduler && airflow webserver && python app.py"]
 ---
 apiVersion: v1
 kind: Service

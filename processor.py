@@ -170,7 +170,7 @@ class EmploymentPermitDataProcessor:
             df['Permits'] = pd.NA
 
         df = df[['Employer Name', 'Permits']]
-        df['Month'] = pd.NA
+        df['Month'] = ''
         df['Year'] = re.search(r'(\d{4})', file_path).group(1)
         df = df.dropna(subset=['Permits'])
         return df
