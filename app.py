@@ -42,4 +42,5 @@ def download_file():
         abort(500, description=f"Error sending the file: {str(e)}")
 
 if __name__ == '__main__':
-    app.run(debug=True, port=4000)
+    app.run(host='0.0.0.0', port=4000, debug=True)
+

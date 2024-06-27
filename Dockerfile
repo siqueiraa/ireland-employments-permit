@@ -16,7 +16,8 @@ RUN git clone https://github.com/siqueiraa/ireland-employments-permit.git .
 
 # Install Python dependencies within the virtual environment
 #RUN /bin/bash -c "source .venv/bin/activate && pip install --no-cache-dir -r requirements.txt"
-RUN /bin/bash -c "pip install --no-cache-dir -r requirements.txt"
+RUN /bin/bash -c "pip install --upgrade pip"
+RUN /bin/bash -c "pip install -r requirements.txt"
 
 # Copy DAGs to the Airflow DAGs directory
 #COPY dags/ /app/dags/
@@ -28,6 +29,9 @@ ENV AIRFLOW_HOME=/app/airflow
 COPY airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
 RUN sed -i 's|dags_folder = /path/to/dags|dags_folder = /app/dags|' ${AIRFLOW_HOME}/airflow.cfg
 RUN sed -i 's|load_examples = True|load_examples = False|' ${AIRFLOW_HOME}/airflow.cfg
+RUN echo -e "\n[webserver]\nweb_server_host = 0.0.0.0" >> ${AIRFLOW_HOME}/airflow.cfg
+
+
 
 # Initialize Airflow default configuration
 RUN mkdir -p ${AIRFLOW_HOME}
