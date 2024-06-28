@@ -131,17 +131,17 @@ class EmploymentPermitDataProcessor:
         df = pd.read_excel(file_path, skiprows=skiprows, engine='openpyxl')
         employer_col = [col for col in df.columns if 'Employer' in str(col) or 'Name' in str(col)]
         if employer_col:
-            df.rename(columns={employer_col[0]: 'Employer Name'}, inplace=True)
+            df.rename(columns={employer_col[0]: 'company_name'}, inplace=True)
         if df.iloc[0].astype(str).str.contains('Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec').any():
-            df.columns = ['Employer Name'] + df.iloc[0, 1:].tolist()
+            df.columns = ['company_name'] + df.iloc[0, 1:].tolist()
             df = df[1:]
         df.columns = df.columns.astype(str)
         df = df.loc[:, ~df.columns.str.contains('Unnamed')]
         df = df.dropna(axis=1, how='all')
-        df = df.dropna(subset=['Employer Name'])
+        df = df.dropna(subset=['company_name'])
         df = df.dropna(how='all', axis=0)
-        df = df[df['Employer Name'] != 'Grand Total']
-        id_vars = ['Employer Name']
+        df = df[df['company_name'] != 'Grand Total']
+        id_vars = ['company_name']
         value_vars = [col for col in df.columns if col not in id_vars]
         df_long = df.melt(id_vars=id_vars, var_name='Month', value_name='Permits')
         df_long = df_long.dropna(subset=['Month'])
@@ -158,10 +158,10 @@ class EmploymentPermitDataProcessor:
         employer_col = [col for col in df.columns if 'Employer' in str(col) or 'Name' in str(col)]
         if not employer_col:
             raise ValueError("Column 'Employer Name' not found")
-        df.rename(columns={employer_col[0]: 'Employer Name'}, inplace=True)
+        df.rename(columns={employer_col[0]: 'company_name'}, inplace=True)
 
-        df = df.dropna(subset=['Employer Name'])
-        df = df[df['Employer Name'] != 'Grand Total']
+        df = df.dropna(subset=['company_name'])
+        df = df[df['company_name'] != 'Grand Total']
 
         permit_col = [col for col in df.columns if 'Total' in str(col) or 'Permit' in str(col)]
         if permit_col:
@@ -169,7 +169,7 @@ class EmploymentPermitDataProcessor:
         else:
             df['Permits'] = pd.NA
 
-        df = df[['Employer Name', 'Permits']]
+        df = df[['company_name', 'Permits']]
         df['Month'] = ''
         df['Year'] = re.search(r'(\d{4})', file_path).group(1)
         df = df.dropna(subset=['Permits'])
