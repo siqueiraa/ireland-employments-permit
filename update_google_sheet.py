@@ -15,7 +15,7 @@ EXCEL_FILE_PATH = 'transform/normalized.xlsx'
 logger.info(f"Excel file path set: {EXCEL_FILE_PATH}")
 
 # Define the path to the JSON credentials file
-SERVICE_ACCOUNT_FILE = 'gdrive-370319-b917c3cbbb14.json'
+SERVICE_ACCOUNT_FILE = 'credentials.json'
 logger.info(f"JSON credentials file path set: {SERVICE_ACCOUNT_FILE}")
 
 # Read the Excel sheet

@@ -8,6 +8,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y git
 
 COPY requirements.txt .
+COPY credentials.json .
 
 RUN /bin/bash -c "pip install --upgrade pip"
 RUN /bin/bash -c "pip install -r requirements.txt" && rm requirements.txt
