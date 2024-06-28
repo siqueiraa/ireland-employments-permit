@@ -5,3 +5,7 @@ flask==2.2.5
 apache-airflow[cncf.kubernetes]==2.9.2
 pendulum==2.1.2
 openpyxl
+google-auth==2.30.0
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0
+google-api-python-client==2.135.0

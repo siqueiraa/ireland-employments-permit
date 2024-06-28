@@ -46,6 +46,7 @@ check_content_change = ContentChangeSensor(
 def run_processor():
     venv_python = '/app/.venv/bin/python'
     os.system(f'{venv_python} /app/processor.py')
+    os.system(f'{venv_python} /app/update_google_sheet.py')
 
 run_processor_task = PythonOperator(
     task_id='run_processor',

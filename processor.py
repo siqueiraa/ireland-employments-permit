@@ -80,6 +80,7 @@ class EmploymentPermitDataProcessor:
                 elif 'permits-issued-to-companies-' in file:
                     df_long = self.load_and_standardize_excel_with_month(file_path)
                 df_long.reset_index(drop=True, inplace=True)  # Ensure unique indices
+                df_long = df_long[df_long['company_name'] != 'Jan - Dec']
                 dfs.append(df_long)
             except Exception as e:
                 logging.error(f"Error processing file {file}: {e}")

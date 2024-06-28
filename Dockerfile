@@ -7,20 +7,13 @@ WORKDIR /app
 # Install git and dependencies
 RUN apt-get update && apt-get install -y git
 
-# Clone the repository
+COPY requirements.txt .
+
+RUN /bin/bash -c "pip install --upgrade pip"
+RUN /bin/bash -c "pip install -r requirements.txt" && rm requirements.txt
+
 RUN git clone https://github.com/siqueiraa/ireland-employments-permit.git .
 
-# Create and activate virtual environment
-#RUN python -m venv .venv
-
-
-# Install Python dependencies within the virtual environment
-#RUN /bin/bash -c "source .venv/bin/activate && pip install --no-cache-dir -r requirements.txt"
-RUN /bin/bash -c "pip install --upgrade pip"
-RUN /bin/bash -c "pip install -r requirements.txt"
-
-# Copy DAGs to the Airflow DAGs directory
-#COPY dags/ /app/dags/
 
 # Set the Airflow home directory
 ENV AIRFLOW_HOME=/app/airflow
