@@ -141,6 +141,7 @@ class EmploymentPermitDataProcessor:
         df = df.dropna(subset=['company_name'])
         df = df.dropna(how='all', axis=0)
         df = df[df['company_name'] != 'Grand Total']
+        df['company_name'] = df['company_name'].apply(lambda x: x.encode('utf-8', 'ignore').decode('utf-8'))
         id_vars = ['company_name']
         value_vars = [col for col in df.columns if col not in id_vars]
         df_long = df.melt(id_vars=id_vars, var_name='Month', value_name='Permits')
@@ -162,6 +163,8 @@ class EmploymentPermitDataProcessor:
 
         df = df.dropna(subset=['company_name'])
         df = df[df['company_name'] != 'Grand Total']
+        df['company_name'] = df['company_name'].apply(lambda x: x.encode('utf-8', 'ignore').decode('utf-8'))
+
 
         permit_col = [col for col in df.columns if 'Total' in str(col) or 'Permit' in str(col)]
         if permit_col:
