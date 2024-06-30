@@ -8,12 +8,12 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y git
 
 COPY requirements.txt .
-COPY credentials.json .
 
 RUN /bin/bash -c "pip install --upgrade pip"
 RUN /bin/bash -c "pip install -r requirements.txt" && rm requirements.txt
 
 RUN git clone https://github.com/siqueiraa/ireland-employments-permit.git .
+COPY credentials.json .
 
 
 # Set the Airflow home directory
