@@ -1,12 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 from airflow.sensors.base import BaseSensorOperator
-from airflow.utils.decorators import apply_defaults
 import re
 import os
 
+
 class ContentChangeSensor(BaseSensorOperator):
-    @apply_defaults
     def __init__(self, url, date_file_path, *args, **kwargs):
         super(ContentChangeSensor, self).__init__(*args, **kwargs)
         self.url = url
