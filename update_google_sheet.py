@@ -10,12 +10,15 @@ logger = logging.getLogger(__name__)
 
 logger.info("Starting script...")
 
+# Define the base directory dynamically
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Define the path to the Excel file
-EXCEL_FILE_PATH = 'transform/normalized.xlsx'
+EXCEL_FILE_PATH = os.path.join(BASE_DIR, 'transform', 'normalized.xlsx')
 logger.info(f"Excel file path set: {EXCEL_FILE_PATH}")
 
 # Define the path to the JSON credentials file
-SERVICE_ACCOUNT_FILE = 'credentials.json'
+SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'credentials.json')
 logger.info(f"JSON credentials file path set: {SERVICE_ACCOUNT_FILE}")
 
 # Read the Excel sheet
