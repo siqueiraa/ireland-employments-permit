@@ -37,7 +37,7 @@ check_content_change = ContentChangeSensor(
     task_id='check_content_change',
     url=URL,
     date_file_path=DATE_FILE_PATH,  # Path to the file storing the last known date
-    poke_interval=600,  # Check every 10 minutes
+    poke_interval=60,  # Check every 10 minutes
     timeout=60,  # Timeout after 1 hour
     dag=dag,
 )
