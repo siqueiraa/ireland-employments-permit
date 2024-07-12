@@ -1,11 +1,15 @@
 import os
 import re
 import requests
-from bs4 import BeautifulSoup
-from datetime import datetime
 import pandas as pd
 import logging
+import warnings
 
+from bs4 import BeautifulSoup
+from datetime import datetime
+
+from process_sector import ProcessSector
+warnings.filterwarnings("ignore")
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -66,7 +70,7 @@ class EmploymentPermitDataProcessor:
             except Exception as e:
                 logging.error(f"Error processing page for year {year}: {e}")
 
-    def process_files(self):
+    def process_files_companies(self):
         patterns = ['companies-issued-with-permits-', 'permits-issued-to-companies-']
         matching_files = self.get_matching_files(self.download_folder, patterns)
 
@@ -100,7 +104,7 @@ class EmploymentPermitDataProcessor:
             df_concatenated = pd.concat(aligned_dfs, ignore_index=True, sort=False)
             df_concatenated = df_concatenated.drop_duplicates()
 
-            normalized_file_name = f'{self.output_folder}/normalized.xlsx'
+            normalized_file_name = f'{self.output_folder}/permits_company.xlsx'
             df_concatenated.to_excel(normalized_file_name, index=False)
 
             logging.info(f"Combined data saved in '{normalized_file_name}'")
@@ -178,6 +182,79 @@ class EmploymentPermitDataProcessor:
         df['Year'] = re.search(r'(\d{4})', file_path).group(1)
         df = df.dropna(subset=['Permits'])
         return df
+    def process_files_nationalities(self):
+        files = self.get_matching_files(self.download_folder, ["permits-by-nationality-"])
+        logging.info(f"Found {len(files)} files to process.")
+
+        # Initialize an empty DataFrame to store combined data
+        combined_df = pd.DataFrame()
+
+        # Process each file with consideration of their structure
+        for file_path in files:
+            try:
+                file_path = os.path.join(self.download_folder, file_path)
+                # Extract year from file name
+                year = os.path.basename(file_path).split('-')[-1].split('.')[0]
+                logging.info(f"Processing file for year: {year} - {file_path}")
+
+                # Read the Excel file
+                df = pd.read_excel(file_path)
+
+                if 'Nationality' in df.columns:
+                    # Handle 2018 structure
+                    if all(col in df.columns for col in ['Nationality', 'New', 'Renewal', 'Refused', 'Withdrawn']):
+                        df_filtered = df[['Nationality', 'New', 'Renewal', 'Refused', 'Withdrawn']].copy()
+                        df_filtered = df_filtered.rename(columns={'New': 'Issued', 'Renewal': 'Renewal'})
+                    else:
+                        logging.warning(f"Skipping file {file_path} due to missing columns.")
+                        continue  # Skip the file if required columns are not present
+                elif 'Unnamed: 1' in df.columns and 'Nationality' in df.iloc[0].tolist():
+                    # Handle 2019 structure
+                    df = pd.read_excel(file_path, skiprows=1)
+                    if df.shape[1] >= 8:
+                        df_filtered = df.iloc[:, [2, 3, 4, 6, 7]].copy()
+                        df_filtered.columns = ['Nationality', 'Issued', 'Renewal', 'Refused', 'Withdrawn']
+                    else:
+                        logging.warning(f"Skipping file {file_path} due to missing columns.")
+                        continue  # Skip the file if required columns are not present
+                else:
+                    # Handle 2020-2024 structure
+                    if df.shape[1] >= 4:
+                        df_filtered = df.rename(columns={df.columns[0]: 'Nationality',
+                                                         df.columns[1]: 'Issued',
+                                                         df.columns[2]: 'Refused',
+                                                         df.columns[3]: 'Withdrawn'})
+                    else:
+                        logging.warning(f"Skipping file {file_path} due to missing columns.")
+                        continue  # Skip the file if required columns are not present
+
+                # Drop rows where 'Nationality' is 'Grand Total' or 'Jan - Dec' or is null
+                df_filtered = df_filtered[~df_filtered['Nationality'].isin(['Grand Total', 'Jan - Dec', ''])]
+                df_filtered = df_filtered.dropna(subset=['Nationality'])
+
+                # Add the year column
+                df_filtered['Year'] = year
+
+                # Combine the data into the main DataFrame
+                combined_df = pd.concat([combined_df, df_filtered], ignore_index=True)
+                logging.info(f"Successfully processed file for year: {year}")
+            except Exception as e:
+                logging.error(f"Error processing file {file_path}: {e}")
+
+        # Reshape the DataFrame to long format
+        combined_long_df = pd.melt(combined_df, id_vars=['Year', 'Nationality'], var_name='Category',
+                                   value_name='Count')
+
+        # Ensure only numeric values are in 'Count' and remove non-numeric rows
+        combined_long_df = combined_long_df[pd.to_numeric(combined_long_df['Count'], errors='coerce').notnull()]
+
+        # Remove rows with empty 'Count'
+        combined_long_df = combined_long_df.dropna(subset=['Count'])
+
+        # Save the combined DataFrame to an Excel file
+        output_file = os.path.join(self.output_folder, "permits-by-nationality.xlsx")
+        combined_long_df.to_excel(output_file, index=False)
+        logging.info(f"Combined data saved to {output_file}")
 
 
 if __name__ == "__main__":
@@ -188,5 +265,8 @@ if __name__ == "__main__":
     start_year = 2009
 
     processor = EmploymentPermitDataProcessor(base_url, start_url, download_folder, output_folder, start_year)
+    processor_sector = ProcessSector(download_folder, output_folder)
     processor.download_files()
-    processor.process_files()
+    processor.process_files_companies()
+    processor.process_files_nationalities()
+    processor_sector.process()
