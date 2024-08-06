@@ -38,9 +38,6 @@ spec:
     app: ireland-employments-permit
   type: NodePort
   ports:
-    - name: web
-      protocol: TCP
-      port: 4000
     - name: airflow
       protocol: TCP
       port: 8080
