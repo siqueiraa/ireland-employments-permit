@@ -1,17 +1,15 @@
 # Ireland Employments Permit
 
-This project automates the process of downloading, processing, and providing employment permit data for Ireland.
+This project automates the process of downloading, processing, and providing employment permit data for Ireland by uploading it to Google Sheets.
 
 ## Setup Instructions
 
 ### Prerequisites
 
 - Docker
-- Docker Compose (for local setup)
-- Kubernetes (for deployment on a cluster)
-- Airflow
+- Kubernetes
 
-### Local Setup with Docker Compose
+### Local Setup
 
 1. Clone the repository:
     ```bash
@@ -19,54 +17,39 @@ This project automates the process of downloading, processing, and providing emp
     cd ireland-employments-permit
     ```
 
-2. Build the Docker image:
+2. Install dependencies:
     ```bash
-    docker build -t siqueiraa/ireland-employments-permit:latest .
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
     ```
 
-3. Run the services:
+3. Run the main script:
     ```bash
-    docker-compose up -d
+    python run_all.py
     ```
-
-4. Access the application:
-    - The REST API will be available at `http://localhost:4000/data`
-    - Airflow UI will be available at `http://localhost:8080`
 
 ### Kubernetes Setup
 
-1. Apply the Kubernetes manifests:
+1. Create a Kubernetes Secret for your Google service account credentials:
     ```bash
-    kubectl apply -f k8s-deployment.yaml
+    kubectl create secret generic google-credentials --from-file=credentials.json=./credentials.json
     ```
 
-2. Ensure the services are running:
+2. Build and push the Docker image:
     ```bash
-    kubectl get pods
-    kubectl get services
+    docker buildx build --platform linux/arm64 -t siqueiraa/ireland-employments-permit:latest -f Dockerfile . --push --no-cache
     ```
 
-3. Access the application:
-    - The REST API will be available at `http://<node-ip>:<node-port>/data`
-    - Airflow UI will be available at `http://<node-ip>:<node-port>`
-
-### Airflow Setup
-
-#### Initializing Airflow
-
-1. Initialize the Airflow database:
+3. Apply the Kubernetes manifests:
     ```bash
-    airflow db init
+    kubectl apply -f k8s-cronjob.yaml
     ```
 
-2. Create an Airflow user:
+4. Ensure the CronJob is running:
     ```bash
-    airflow users create --username admin --firstname FIRST_NAME --lastname LAST_NAME --role Admin --email admin@example.com
+    kubectl get cronjobs
     ```
-
-#### DAGs
-
-The DAGs are defined in the `dags/` folder. The primary DAG is `check_and_run_processor_dag.py`, which checks for content changes on the specified URL and triggers the data processing if changes are detected.
 
 ### Dashboard
 
@@ -75,4 +58,3 @@ You can view the data on the [Google Looker Studio Dashboard](https://lookerstud
 ### Contact
 
 For any inquiries or support, please reach out via [LinkedIn](https://www.linkedin.com/in/rafael-siqueiraa/).
-

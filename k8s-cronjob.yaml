@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ireland-employments-permit-processor
+spec:
+  schedule: "0 * * * *" # Run every hour
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: processor
+            image: siqueiraa/ireland-employments-permit:latest # Use the same image as the deployment
+            command: ["python", "run_all.py"]
+            volumeMounts:
+            - name: credentials-volume
+              mountPath: /app/credentials.json
+              subPath: credentials.json
+          restartPolicy: OnFailure
+          volumes:
+          - name: credentials-volume
+            secret:
+              secretName: google-credentials
