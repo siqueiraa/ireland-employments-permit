@@ -11,6 +11,7 @@ spec:
           containers:
           - name: processor
             image: siqueiraa/ireland-employments-permit:latest # Use the same image as the deployment
+            imagePullPolicy: Always # Force Kubernetes to always pull the image
             command: ["python", "run_all.py"]
             volumeMounts:
             - name: credentials-volume
