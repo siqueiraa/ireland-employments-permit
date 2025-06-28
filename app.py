@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 # --- Data Loading at Startup ---
 DATA_CACHE = []
-FILE_PATH = os.path.join('transform', 'normalized.xlsx')
+FILE_PATH = os.path.join('transform', 'permits_company.xlsx')
 
 def load_data():
     """Loads and processes data from the Excel file into a cache."""

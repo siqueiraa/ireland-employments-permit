@@ -3,7 +3,7 @@ beautifulsoup4==4.12.3
 requests==2.32.3
 flask==2.2.5
 apache-airflow[cncf.kubernetes]==2.9.2
-pendulum==2.1.2
+pendulum==3.0.0
 openpyxl
 google-auth==2.30.0
 google-auth-oauthlib==1.2.0

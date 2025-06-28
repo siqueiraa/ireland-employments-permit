@@ -92,12 +92,9 @@ class ProcessSector:
 
 
     def process_permits_gt_2024(self, data, year, file_path):
-        available_months = pd.read_excel(file_path, nrows=1).columns[2:]
-
-        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        used_months = [month for month in months if month in available_months]
-
-        data.columns = ['Economic Sector', 'Grand Total'] + used_months
+        header = pd.read_excel(file_path, nrows=1, skiprows=1).columns
+        columns = ['Economic Sector'] + header[1:].tolist()
+        data.columns = columns
 
         data.drop(columns=['Grand Total'], inplace=True)
         data['Year'] = year
@@ -108,7 +105,9 @@ class ProcessSector:
         data = data[~data['Sector'].str.contains("Grand Total", na=False)]
 
         data_long = data.melt(id_vars=['Year', 'Sector', 'Type'], var_name='Month', value_name='Count')
+        data_long['Count'] = data_long['Count'].astype(str)
         data_long = data_long[~data_long['Count'].str.contains("Issued", na=False)]
+        data_long['Count'] = pd.to_numeric(data_long['Count'], errors='coerce').fillna(0).astype(int)
         return data_long
     def process_permits_data_combined(self, file_path):
         """Combine processing steps by extracting the year and choosing the appropriate method."""
@@ -118,7 +117,7 @@ class ProcessSector:
             data = pd.read_excel(file_path)
             return self.process_lt_2020(data=data)
         elif year >= 2024:
-            data = pd.read_excel(file_path)
+            data = pd.read_excel(file_path, skiprows=2)
             return self.process_permits_gt_2024(data=data, year=year, file_path=file_path)
         elif year >= 2022:
             data = pd.read_excel(file_path, skiprows=2)
