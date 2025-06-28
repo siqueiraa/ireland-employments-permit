@@ -48,5 +48,5 @@ RUN /bin/bash -c "airflow users create --username $AIRFLOW_USER --firstname $AIR
 EXPOSE 8080 4000
 
 # Start Airflow scheduler, webserver, and the Flask app
-CMD ["/bin/bash", "-c", "airflow scheduler & airflow webserver --port 8080 & python app.py"]
+CMD ["/bin/bash", "-c", "airflow scheduler & airflow webserver --port 8080 & gunicorn --bind 0.0.0.0:4000 app:app"]
 
